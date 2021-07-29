@@ -745,8 +745,8 @@ class Mega:
 
                 file_info = os.stat(temp_output_file.name)
                 # Edit status message
-                dlstats_msg.edit(f"📥 **DOWNLOADING** 📥 \n\n🏷 **File Name:** `{file_name}` \n📦 **File Size:** `{humanize.naturalsize(file_size)}` \n✅ **Downloaded:** `{humanize.naturalsize(file_info.st_size)}` \n\n**© @AsmSafone | @SafoTheBot**")
-                logger.info('%s of %s downloaded', file_name, file_info.st_size,
+                dlstats_msg.edit(f"**Downloading ...** \n\n🏷 **File Name:** `{file_name}` \n📦 **Total Size:** `{humanize.naturalsize(file_size)}` \n✅ **Downloaded:** `{humanize.naturalsize(file_info.st_size)}` \n\n**© @AsmSafone | @SafoTheBot**")
+                logger.info('%s of %s downloaded', file_info.st_size,
                             file_size)
             file_mac = str_to_a32(mac_str)
             # check mac integrity
