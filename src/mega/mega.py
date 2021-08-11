@@ -14,8 +14,10 @@ import random
 import binascii
 import tempfile
 import shutil
-
+import asyncio
 import requests
+from pyrogram.errors import FloodWait, MessageNotModified
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from tenacity import retry, wait_exponential, retry_if_exception_type
 
 from .errors import ValidationError, RequestError
@@ -702,7 +704,7 @@ class Mega:
         else:
             dest_path += '/'
         
-        # Download Status message of Pyrogram Bot
+        # Download Status message of MegaDL-Bot
         if statusdl_msg is not None:
             dlstats_msg = statusdl_msg
         else:
@@ -745,9 +747,17 @@ class Mega:
 
                 file_info = os.stat(temp_output_file.name)
                 # Edit status message
-                dlstats_msg.edit(f"**Downloading ...** \n\n🏷 **File Name:** `{file_name}` \n📦 **Total Size:** `{humanize.naturalsize(file_size)}` \n✅ **Downloaded:** `{humanize.naturalsize(file_info.st_size)}` \n\n**© @AsmSafone | @SafoTheBot**")
-                logger.info('%s of %s downloaded', file_info.st_size,
+                try:
+                  dlstats_msg.edit(f"**Downloading Wait ...** \n\n➩ **File Name:** `{file_name}` \n➩ **File Size:** `{humanize.naturalsize(file_size)}` \n➩ **Downloaded:** `{humanize.naturalsize(file_info.st_size)}` \n\n**@AsmSafone | @SafoTheBot**", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Cancel Mega DL", callback_data="cancel")]]))
+                  logger.info('%s of %s downloaded', file_info.st_size,
                             file_size)
+                except MessageNotModified:
+                  continue
+                except FloodWait as e:
+                  asyncio.sleep(e.x)
+                except Exception as e:
+                  print(e)
+                  continue
             file_mac = str_to_a32(mac_str)
             # check mac integrity
             if (file_mac[0] ^ file_mac[1],
