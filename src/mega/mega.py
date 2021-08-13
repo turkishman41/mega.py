@@ -1,4 +1,5 @@
 import math
+import time
 import humanize
 import re
 import json
@@ -747,17 +748,27 @@ class Mega:
 
                 file_info = os.stat(temp_output_file.name)
                 # Edit status message
+                percentage = file_info.st_size * 100 / file_size
+                
+                progress = "`[{0}{1}]` \n".format(
+                  ''.join(["●" for i in range(math.floor(percentage / 5))]),
+                  ''.join(["○" for i in range(20 - math.floor(percentage / 5))])
+                )
+
+                ok = "`{0}%`".format(
+                  round(percentage, 2)
+                )
+
                 try:
-                  dlstats_msg.edit(f"**Downloading Wait ...** \n\n➩ **File Name:** `{file_name}` \n➩ **File Size:** `{humanize.naturalsize(file_size)}` \n➩ **Downloaded:** `{humanize.naturalsize(file_info.st_size)}` \n\n**@AsmSafone | @SafoTheBot**", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Cancel Mega DL", callback_data="cancel")]]))
+                  dlstats_msg.edit(f"**Downloading Wait ...** {ok} \n{progress} \n➩ **Name:** `{file_name}` \n➩ **Done:** `{humanize.naturalsize(file_info.st_size)}` \n➩ **Total:** `{humanize.naturalsize(file_size)}`\n\n**@AsmSafone | @SafoTheBot**", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Cancel Mega DL", callback_data="cancel")]]))
                   logger.info('%s of %s downloaded', file_info.st_size,
                             file_size)
                 except MessageNotModified:
                   continue
                 except FloodWait as e:
                   asyncio.sleep(e.x)
-                except Exception as e:
-                  print(e)
-                  continue
+                except Exception:
+                  pass
             file_mac = str_to_a32(mac_str)
             # check mac integrity
             if (file_mac[0] ^ file_mac[1],
