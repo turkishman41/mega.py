@@ -709,7 +709,7 @@ class Mega:
         if statusdl_msg is not None:
             dlstats_msg = statusdl_msg
         else:
-            print("Can't Get Download Status Message")
+            print("İndirmə Durum Mesajı Alınamır")
             return
 
         with tempfile.NamedTemporaryFile(mode='w+b',
